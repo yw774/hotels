@@ -106,37 +106,96 @@ module.exports.hotelsGetOne = function(req, res) {
       console.log("Error Found hotel");
       res
         .status(500)
-        .json("Error Found Hotel");
+        .json({message: err});
     })
 
 };
-/*
+
+var _splitArray = function(input) {
+  var output;
+  if(input && input.length > 0) {
+    output = input.split(";");
+  } else {
+    output = [];
+  }
+  return output;
+}
+
 module.exports.hotelsAddOne = function(req, res) {
   console.log("POST new hotel");
-  var db = dbconn.get();
-  var collection = db.collection('hotels');
-  var newHotel;
-
-  if (req.body && req.body.name && req.body.stars) {
-    newHotel = req.body;
-    newHotel.stars = parseInt(req.body.stars, 10);
-    collection.insertOne(newHotel, function(err, response) {
-      console.log("Hotel added", response);
-      console.log("Hotel added", response.ops);
-      res
-        .status(201)
-        .json(response.ops);
-    });
-    // console.log(newHotel);
-    // res
-    //   .status(200)
-    //   .json(newHotel);
-  } else {
-    console.log("Data missing from body");
-    res
-      .status(400)
-      .json({ message : "Required data missing from body" });
-  }
+  Hotel
+    .create({
+      name: req.body.name,
+      description: req.body.description,
+      stars: parseInt(req.body.stars, 10),
+      services: _splitArray(req.body.services),
+      photos: _splitArray(req.body.photos),
+      currency: req.body.currency,
+      location: {
+        address: req.body.address,
+        coordinates: [
+          parseFloat(req.body.lng),
+          parseFloat(req.body.lat)
+        ]
+      }
+    }, function(err, hotel) {
+      if(err) {
+        console.log("Error creating hotel");
+        res
+          .status(400)
+          .json(err);
+      } else {
+        console.log("Hotel created", hotel);
+        res
+          .status(201)
+          .json(hotel);
+      }
+    })
 
 };
-*/
+
+module.exports.hotelsUpdateOne = function(req, res) {
+  var id = req.params.hotelId;
+  console.log('GET hotelId', id);
+
+  Hotel
+    .findById(id)
+    .select("-reviews -rooms")
+    .exec(function(err, doc) {
+      if(err){
+        res
+          .status(500)
+          .json(err);
+      }
+      else if(!doc){
+        res
+          .status(404)
+          .json({message: "Hotel ID not found"});
+      } else {
+        doc.name = req.body.name,
+        doc.description = req.body.description,
+        doc.stars = parseInt(req.body.stars, 10),
+        doc.services = _splitArray(req.body.services),
+        doc.photos = _splitArray(req.body.photos),
+        doc.currency = req.body.currency,
+        doc.location = {
+          address: req.body.address,
+          coordinates: [
+            parseFloat(req.body.lng),
+            parseFloat(req.body.lat)
+          ]
+        }
+        doc.save(function(err, hotelUpdated) {
+          if(err) {
+            res
+              .status(500)
+              .json(err);
+          } else {
+            res
+              .status(200)
+              .json(hotelUpdated);
+          }
+        })
+      }
+    })
+}

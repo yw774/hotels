@@ -25,26 +25,26 @@ DELETE | reviews/54321        |delete a specific review for a specifc hotel
 router
   .route('/hotels')
   .get(ctrlHotels.hotelsGetAll)
-  //.post(ctrlHotels.hotelsAddOne);
+  .post(ctrlHotels.hotelsAddOne);
 
 router
   .route('/hotels/:hotelId')
   .get(ctrlHotels.hotelsGetOne)
-  //.put(ctrlHotels.hotelsUpdateOne)
+  .put(ctrlHotels.hotelsUpdateOne)
   //.delete(ctrlHotels.hotelsDeleteOne);
 
 // review
 router
   .route('/hotels/:hotelId/reviews')
   .get(ctrlReviews.reviewsGetAll)
-  //.post(ctrilReviews.reviewsAddOne);
+  .post(ctrlReviews.reviewsAddOne);
 
 
 router
   .route('/hotels/:hotelId/reviews/:reviewId')
   .get(ctrlReviews.reviewsGetOne)
-  //.put(ctrilReviews.reviewsUpdateOne)
-  //.delete(ctrilReviews.reviewsDeleteOne);
+  .put(ctrlReviews.reviewsUpdateOne)
+  //.delete(ctrlReviews.reviewsDeleteOne);
 /*
 // authentication
 router
